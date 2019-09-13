@@ -1,0 +1,6 @@
+{
+  "verbose": true,
+  "watch": ["src/*", "index.js", ".env"],
+  "runOnChangeOnly": true,
+  "ext": "js,json,graphql"
+}
