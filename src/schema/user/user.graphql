@@ -1,0 +1,138 @@
+##############################################################################
+##############################################################################
+## Types
+
+# User Type
+type User {
+  id: ObjectId!
+  firstName: String!
+  lastName: String!
+  email: Email!
+  emailVerification: EmailVerification!
+  mobilePhone: MobilePhone!
+  mobilePhoneVerification: MobilePhoneVerification!
+  password: String!
+  passwordReset: PasswordReset! @auth(requires: ADMIN)
+  refreshTokens: [RefreshToken]!
+  roles: [UserRole]!
+  createdAt: DateTime! @dateTime @auth(requires: ADMIN)
+  updatedAt: DateTime! @dateTime @auth(requires: ADMIN)
+}
+
+# Email verification type
+type EmailVerification {
+  token: String! @auth(requires: ADMIN)
+  verified: Boolean!
+  verifiedOn: DateTime @dateTime
+}
+
+# Mobile phone verification type
+type MobilePhoneVerification {
+  token: String! @auth(requires: ADMIN)
+  verified: Boolean!
+  verifiedOn: DateTime @dateTime
+}
+
+# Password reset type
+type PasswordReset {
+  token: String! @auth(requires: ADMIN)
+  expiresOn: DateTime @dateTime
+}
+
+# Refresh token type
+type RefreshToken {
+  token: String!
+  expiresOn: DateTime @dateTime
+}
+
+##############################################################################
+##############################################################################
+## Input
+input UserInput {
+  userId: ObjectId
+  email: Email
+}
+
+input SignupInput {
+  firstName: String!
+  lastName: String!
+  email: Email!
+  mobilePhone: MobilePhone!
+  password: String!
+}
+
+input LoginInput {
+  email: Email
+  password: String!
+  rememberMe: Boolean! = false
+}
+
+input RenewAccessTokenInput {
+  userId: ObjectId!
+  refreshToken: String!
+}
+
+input VerifyEmailInput {
+  userId: ObjectId!
+  verificationToken: String!
+}
+
+input VerifyMobilePhoneInput {
+  userId: ObjectId!
+  verificationToken: String!
+}
+
+input ForgetPasswordInput {
+  email: Email!
+}
+
+input IsValidPasswordResetInput {
+  userId: ObjectId!
+  passwordResetToken: String!
+}
+
+input ResetPasswordWithTokenInput {
+  userId: ObjectId!
+  passwordResetToken: String!
+  password: String!
+}
+
+##############################################################################
+##############################################################################
+## Payload
+type SignupPayload {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type LoginPayload {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type RenewAccessTokenPayload {
+  accessToken: String!
+}
+
+##############################################################################
+##############################################################################
+## Query
+extend type Query {
+  user(input: UserInput!): User! @auth(requires: ADMIN)
+  users: [User]! @auth(requires: ADMIN)
+  currentUser: User! @auth
+  renewAccessToken(input: RenewAccessTokenInput!): RenewAccessTokenPayload
+  isValidPasswordReset(input: IsValidPasswordResetInput!): Boolean!
+}
+
+##############################################################################
+##############################################################################
+## Mutation
+extend type Mutation {
+  signup(input: SignupInput!): SignupPayload
+  login(input: LoginInput!): LoginPayload
+  verifyEmail(input: VerifyEmailInput!): Boolean!
+  verifyMobilePhone(input: VerifyMobilePhoneInput!): Boolean!
+  forgetPassword(input: ForgetPasswordInput!): Boolean!
+  resetPasswordWithToken(input: ResetPasswordWithTokenInput!): Boolean!
+}
